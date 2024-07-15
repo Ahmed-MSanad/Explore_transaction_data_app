@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Job Fair Task</title>
+        <link rel="stylesheet" href="css/output.css">
+    </head>
+<body class="bg-orange-50">
+    
+    <main class="py-10">
+        <h1 class="text-4xl text-center font-bold my-10">Explore Your Transactions</h1>
+
+        <div class="w-full px-2 md:px-3 mb-8  mx-auto">
+            <div class="relative flex-[1_auto] border shadow-lg rounded-2xl border-stone-200 flex flex-col bg-white my-5 md:mx-5">
+                <div class="px-9 py-5 flex flex-wrap flex-col md:flex-row justify-between items-center">
+                    <h3 class="font-bold text-dark text-center md:text-start">Manage Your Finances with Ease</h3>
+                    <div class="btns flex flex-wrap flex-col md:flex-row">
+                        <button id="sortByNameBtn" class="bg-orange-600 rounded-lg md:me-2 my-3 md:my-0 text-white px-5 py-2">Sort By Name</button>
+                        <button id="sortByAmountBtn" class="border-2 hover:bg-teal-600 rounded-lg transition-all duration-500 hover:text-white px-5 py-2">Sort By Amount</button>
+                    </div>
+                </div>
+                <div class="flex-auto overflow-x-auto py-8 px-2 md:px-9">
+                    <table class="w-full my-0 align-middle text-dark border-neutral-200">
+                        <thead class="align-bottom">
+                            <tr class="font-semibold text-[0.95rem] text-secondary-dark">
+                                <th class="pb-3 text-start min-w-[150px] md:w-2/12">USER</th>
+                                <th class="pb-3 text-end min-w-[150px] md:w-4/12">AMOUNT</th>
+                                <th class="pb-3 text-end min-w-[150px] md:w-4/12">DATE</th>
+                                <th class="pb-3 text-end min-w-[150px] md:w-4/12">CHART</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="chartContainer container mx-auto">
+            <canvas id="myChart"></canvas>
+        </div>
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
