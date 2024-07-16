@@ -11,8 +11,13 @@ let depositLogo = ` <span class="text-center align-baseline inline-flex md:px-2 
                         </svg>
                     </span>`
 
+                    let searchByNameInput = document.getElementById('filterByName');
+                    let searchByAmountInput = document.getElementById('filterByAmount');
+
+
 document.querySelector('#sortByNameBtn').addEventListener('click',(e) => {sort(e.target.id);});
 document.querySelector('#sortByAmountBtn').addEventListener('click',(e) => {sort(e.target.id);});
+
 
 function sort(id){
     let allUserRows = document.querySelectorAll('.userRow');
@@ -54,21 +59,22 @@ function sort(id){
 
 async function fetchData(){
     try{
-        let response = await fetch('data.json');
+        let response = await fetch('../data.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        // console.log(data);
         return data;
     }catch(error){
         console.log(error);
     }
 }
 
-function displayData(transaction_data){
+function displayData(transaction_data,customer_data){
     let box = ``;
-    let transactions = transaction_data.transactions;
-    let customers = transaction_data.customers;
+    let transactions = transaction_data;
+    let customers = customer_data;
     for(let i = 0 ; i < transactions.length ; i++){
         box += `
             <tr class="userRow border-b-2 last:border-b-0">
@@ -91,20 +97,19 @@ function displayData(transaction_data){
                 <td class="pr-0 text-end">
                     <span class="transaction_date font-semibold text-md/normal">${transactions[i].date}</span>
                 </td>
-                <td class="text-end"><button class="showChartBtn hover:bg-orange-600 transition-all duration-500 rounded-lg border-2 hover:text-white px-5 py-2">Show Chart</button></td>
+                <td class="text-end"><button id="${transactions[i].customer_id}" class="showChartBtn hover:bg-orange-600 transition-all duration-500 rounded-lg border-2 hover:text-white px-5 py-2">Show Chart</button></td>
             </tr>
         `
     }
     document.querySelector('tbody').innerHTML = box;
 }
 
-
-function showChart(trans_idx){
+function showChart(customer_id){
+        customer_id = +customer_id;
         let transactions = apiData.transactions;
-        let customer_idx = apiData.transactions[trans_idx].customer_id-1; // customers array read form the api is from [0-4] while ids are from [1-5]
         let user_transactions = [];
         for(let u of transactions){ // loop through all transactions and get the date and amount data of this user 
-            if(+u.customer_id-1 === customer_idx) // 
+            if(+u.customer_id === customer_id)
                 user_transactions.push(u);
         }
         // console.log(user_transactions);
@@ -116,7 +121,7 @@ function showChart(trans_idx){
         // console.log(data);
 
 
-        let userName = apiData.customers[customer_idx].name;
+        let userName = apiData.customers[customer_id-1].name;
         if(chartInstance){
             chartInstance.destroy();
         }
@@ -139,16 +144,46 @@ function showChart(trans_idx){
         document.querySelector('.chartContainer')?.scrollIntoView({behavior: 'smooth'});
 }
 
+function showChartSetup(){
+    let allButtons = document.querySelectorAll('.showChartBtn');
+    for(let i = 0 ; i < allButtons.length ; i++){
+        allButtons[i].addEventListener('click',(e) => {showChart(e.target.id);})
+    }
+}
+
+function searchByName(name){
+    let allTransactions = apiData["transactions"];
+    let customer_transactions = [];
+    for(let i = 0 ; i < allTransactions.length ; i++){
+        if(apiData["customers"][allTransactions[i]["customer_id"]-1]["name"].toLowerCase().includes(name.toLowerCase())){
+            customer_transactions.push(allTransactions[i]);
+        }
+    }
+    displayData(customer_transactions,apiData["customers"]);
+    showChartSetup();
+}
+
+function searchByAmount(amount){
+    let allTransactions = apiData["transactions"];
+    let amounts_greater_or_equal = [];
+    for(let i = 0 ; i < allTransactions.length ; i++){
+        if(+allTransactions[i]["amount"] >= +amount){
+            amounts_greater_or_equal.push(allTransactions[i]);
+        }
+    }
+    displayData(amounts_greater_or_equal,apiData["customers"]);
+    showChartSetup();
+}
+
 
 let chartInstance = null;
 
 (async function() {
     apiData = await fetchData();
-    displayData(apiData);
-    let allButtons = document.querySelectorAll('.showChartBtn');
-    for(let i = 0 ; i < allButtons.length ; i++){
-        allButtons[i].addEventListener('click',(e) => {showChart(i);})
-    }
+    displayData(apiData["transactions"],apiData["customers"]);
+    searchByNameInput.addEventListener('input',(e)=>{searchByName(searchByNameInput.value);});
+    searchByAmountInput.addEventListener('input',(e)=>{searchByAmount(searchByAmountInput.value);});
+    showChartSetup();
     // default chart:
     let data = [];
     chartInstance = new Chart(
