@@ -59,7 +59,7 @@ function sort(id){
 
 async function fetchData(){
     try{
-        let response = await fetch('../data.json');
+        let response = await fetch('data.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
